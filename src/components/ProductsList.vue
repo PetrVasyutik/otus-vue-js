@@ -4,10 +4,18 @@
       <h3 class="product-list__title">Каталог товаров</h3>
       <title-search @search="handleSearch" />
     </div>
-    <div class="products-list__container">
-      <product-card
+    <div class="products-list__body">
+      <div class="products-list__search-category">
+        <category-search
+          :categories="categories"
+          @category-change="handleCategoryChange"
+        />
+      </div>
+      <div class="products-list__catalog">
+        <product-card
         v-for="product in filteredAndSortedProducts" :key="product.id"
         :product="product" />
+      </div>
     </div>
   </div>
 </template>
@@ -16,6 +24,7 @@
 import { ref, computed } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import TitleSearch from '@/components/TitleSearch.vue';
+import CategorySearch from '@/components/CategorySearch.vue';
 
 const props = defineProps({
   products: {
@@ -28,17 +37,33 @@ const props = defineProps({
 const searchFilters = ref({
   query: '',
   maxPrice: null,
-  isNumeric: false
+  isNumeric: false,
+  selectedCategories: []
+})
+
+
+const categories = computed(() => {
+  const uniqueCategories = new Set()
+  props.products.forEach(product => {
+    if (product?.category) {
+      uniqueCategories.add(product.category)
+    }
+  })
+  return Array.from(uniqueCategories).sort()
 })
 
 const handleSearch = (filters) => {
-  searchFilters.value = filters
+  searchFilters.value = { ...searchFilters.value, ...filters }
+}
+
+const handleCategoryChange = (selectedCategories) => {
+  searchFilters.value.selectedCategories = selectedCategories
 }
 
 const filteredAndSortedProducts = computed(() => {
   let filtered = [...props.products]
 
-  const { query, maxPrice, isNumeric } = searchFilters.value
+  const { query, maxPrice, isNumeric, selectedCategories } = searchFilters.value
 
   if (isNumeric && maxPrice !== null && maxPrice > 0) {
     filtered = filtered.filter(product =>
@@ -49,6 +74,12 @@ const filteredAndSortedProducts = computed(() => {
   else if (query) {
     filtered = filtered.filter(product =>
       product?.title?.toLowerCase().includes(query) ?? false
+    )
+  }
+
+  if (selectedCategories.length > 0) {
+    filtered = filtered.filter(product =>
+      selectedCategories.includes(product?.category)
     )
   }
 
@@ -75,7 +106,7 @@ const filteredAndSortedProducts = computed(() => {
   padding: 0 20px;
 }
 
-.products-list__container {
+.products-list__catalog {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -89,5 +120,9 @@ const filteredAndSortedProducts = computed(() => {
   font-size: 20px;
   font-weight: 700;
   color:chocolate
+}
+
+.products-list__search-category {
+  margin-bottom: 20px;
 }
 </style>

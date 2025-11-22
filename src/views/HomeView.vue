@@ -48,6 +48,11 @@
           <order-form />
         </div>
       </section>
+      <section class="section">
+        <div class="new-product-form">
+          <new-product-form :products="products" />
+        </div>
+      </section>
       </div>
     </section>
   </main>
@@ -57,6 +62,7 @@ import { ref, onMounted } from 'vue';
 import ProductsList from '@/components/ProductsList.vue';
 import { useProducts } from '@/composables/useProducts';
 import OrderForm from '@/components/OrderForm.vue';
+import NewProductForm from '@/components/NewProductForm.vue';
 
 const hoverBgColor = ref('#f5f5f5');
 const hoverTextColor = ref('green');

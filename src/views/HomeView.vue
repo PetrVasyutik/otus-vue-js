@@ -43,6 +43,11 @@
         <div v-else class="section__products">
           <products-list :products="products" />
         </div>
+      <section class="section">
+        <div class="order-form">
+          <order-form />
+        </div>
+      </section>
       </div>
     </section>
   </main>
@@ -51,6 +56,7 @@
 import { ref, onMounted } from 'vue';
 import ProductsList from '@/components/ProductsList.vue';
 import { useProducts } from '@/composables/useProducts';
+import OrderForm from '@/components/OrderForm.vue';
 
 const hoverBgColor = ref('#f5f5f5');
 const hoverTextColor = ref('green');

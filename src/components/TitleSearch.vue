@@ -11,28 +11,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useSearchQuery } from '@/composables/useSearchQuery'
 
 const emit = defineEmits(['search'])
 
-const searchQuery = ref('')
+const { searchQuery, processSearchQuery } = useSearchQuery()
 
 const handleSearch = () => {
-  const query = searchQuery.value.trim()
-
-  // Проверяем, является ли запрос числом (может быть целым или с точкой)
-  // Важно: проверяем, что вся строка - это число, а не содержит число
-  const numericValue = parseFloat(query)
-  const isNumeric = !isNaN(numericValue) &&
-                     isFinite(numericValue) &&
-                     query !== '' &&
-                     query === String(numericValue) // Вся строка должна быть числом
-
-  emit('search', {
-    query: isNumeric ? '' : query.toLowerCase(), // Если число - не ищем по названию
-    maxPrice: isNumeric ? numericValue : null,
-    isNumeric
-  })
+  const searchFilters = processSearchQuery()
+  emit('search', searchFilters)
 }
 </script>
 

@@ -21,10 +21,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { toRef } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import TitleSearch from '@/components/TitleSearch.vue';
 import CategorySearch from '@/components/CategorySearch.vue';
+import { useProductFilters } from '@/composables/useProductFilters';
+import { useCategories } from '@/composables/useCategories';
 
 const props = defineProps({
   products: {
@@ -34,61 +36,24 @@ const props = defineProps({
   }
 });
 
-const searchFilters = ref({
-  query: '',
-  maxPrice: null,
-  isNumeric: false,
-  selectedCategories: []
-})
+// Преобразуем props.products в ref для composables
+const products = toRef(props, 'products')
 
-
-const categories = computed(() => {
-  const uniqueCategories = new Set()
-  props.products.forEach(product => {
-    if (product?.category) {
-      uniqueCategories.add(product.category)
-    }
-  })
-  return Array.from(uniqueCategories).sort()
-})
+// Используем composables для работы с фильтрами и категориями
+const { categories } = useCategories(products)
+const { 
+  updateSearchFilters, 
+  updateCategories, 
+  filteredAndSortedProducts 
+} = useProductFilters(products)
 
 const handleSearch = (filters) => {
-  searchFilters.value = { ...searchFilters.value, ...filters }
+  updateSearchFilters(filters)
 }
 
 const handleCategoryChange = (selectedCategories) => {
-  searchFilters.value.selectedCategories = selectedCategories
+  updateCategories(selectedCategories)
 }
-
-const filteredAndSortedProducts = computed(() => {
-  let filtered = [...props.products]
-
-  const { query, maxPrice, isNumeric, selectedCategories } = searchFilters.value
-
-  if (isNumeric && maxPrice !== null && maxPrice > 0) {
-    filtered = filtered.filter(product =>
-      product?.price <= maxPrice
-    )
-  }
-
-  else if (query) {
-    filtered = filtered.filter(product =>
-      product?.title?.toLowerCase().includes(query) ?? false
-    )
-  }
-
-  if (selectedCategories.length > 0) {
-    filtered = filtered.filter(product =>
-      selectedCategories.includes(product?.category)
-    )
-  }
-
-  return filtered.sort((a, b) => {
-    const rateA = a?.rating?.rate ?? 0
-    const rateB = b?.rating?.rate ?? 0
-    return rateB - rateA
-  })
-})
 </script>
 
 <style scoped lang="css">

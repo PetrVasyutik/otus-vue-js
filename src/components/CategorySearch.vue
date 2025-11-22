@@ -9,8 +9,8 @@
       <input
         type="checkbox"
         :value="category"
-        :checked="selectedCategories.includes(category)"
-        @change="handleCategoryToggle"
+        v-model="selectedCategories"
+        @change="handleCategoryChange"
         class="category-search__checkbox"
       />
       {{ category }}
@@ -33,20 +33,7 @@ const emit = defineEmits(['category-change'])
 
 const selectedCategories = ref([])
 
-const handleCategoryToggle = (event) => {
-  const category = event.target.value
-  const isChecked = event.target.checked
-
-  if (isChecked) {
-    if (!selectedCategories.value.includes(category)) {
-      selectedCategories.value.push(category)
-    }
-  } else {
-    selectedCategories.value = selectedCategories.value.filter(
-      cat => cat !== category
-    )
-  }
-
+const handleCategoryChange = () => {
   emit('category-change', [...selectedCategories.value])
 }
 

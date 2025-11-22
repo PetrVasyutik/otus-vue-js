@@ -1,17 +1,32 @@
 <template>
   <div class="products-list">
-    <h3 class="product-list__title">Каталог товаров</h3>
-    <div class="products-list__container">
-      <product-card
-        v-for="product in sortedProducts" :key="product.id"
+    <div class="products-list__header">
+      <h3 class="product-list__title">Каталог товаров</h3>
+      <title-search @search="handleSearch" />
+    </div>
+    <div class="products-list__body">
+      <div class="products-list__search-category">
+        <category-search
+          :categories="categories"
+          @category-change="handleCategoryChange"
+        />
+      </div>
+      <div class="products-list__catalog">
+        <product-card
+        v-for="product in filteredAndSortedProducts" :key="product.id"
         :product="product" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import ProductCard from './ProductCard.vue';
+import { toRef } from 'vue';
+import ProductCard from '@/components/ProductCard.vue';
+import TitleSearch from '@/components/TitleSearch.vue';
+import CategorySearch from '@/components/CategorySearch.vue';
+import { useProductFilters } from '@/composables/useProductFilters';
+import { useCategories } from '@/composables/useCategories';
 
 const props = defineProps({
   products: {
@@ -21,13 +36,24 @@ const props = defineProps({
   }
 });
 
-const sortedProducts = computed(() => {
-  return [...props.products].sort((a, b) => {
-    const rateA = a?.rating?.rate ?? 0
-    const rateB = b?.rating?.rate ?? 0
-    return rateB - rateA
-  })
-})
+// Преобразуем props.products в ref для composables
+const products = toRef(props, 'products')
+
+// Используем composables для работы с фильтрами и категориями
+const { categories } = useCategories(products)
+const { 
+  updateSearchFilters, 
+  updateCategories, 
+  filteredAndSortedProducts 
+} = useProductFilters(products)
+
+const handleSearch = (filters) => {
+  updateSearchFilters(filters)
+}
+
+const handleCategoryChange = (selectedCategories) => {
+  updateCategories(selectedCategories)
+}
 </script>
 
 <style scoped lang="css">
@@ -35,7 +61,17 @@ const sortedProducts = computed(() => {
   width: 100%;
 }
 
-.products-list__container {
+.products-list__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.products-list__catalog {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -48,7 +84,10 @@ const sortedProducts = computed(() => {
   text-align: center;
   font-size: 20px;
   font-weight: 700;
-  margin-bottom: 20px;
   color:chocolate
+}
+
+.products-list__search-category {
+  margin-bottom: 20px;
 }
 </style>

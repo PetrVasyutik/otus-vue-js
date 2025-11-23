@@ -25,7 +25,7 @@ const props = defineProps({
 </script>
 <style scoped lang="css">
 .product-card {
-  width: 220px;
+  width: 270px;
   height: auto;
   background-color: rgb(255, 255, 233);
   padding: 25px 15px;
@@ -35,7 +35,6 @@ const props = defineProps({
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  flex-grow: 1;
 }
 .product-card__image {
   width: 100%;

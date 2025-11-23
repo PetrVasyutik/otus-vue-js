@@ -31,7 +31,7 @@
       </div>
     </section>
     <section class="section">
-      <h2 class="section__title">Урок 4 - компоненты, props и события</h2>
+      <h2 class="section__title">Уроки 4, 5 - компоненты, props, формы и события</h2>
       <div class="section__body">
         <div v-if="productsState.loading" class="loading">
           <p>Загружаем товары...</p>
@@ -43,13 +43,26 @@
         <div v-else class="section__products">
           <products-list :products="products" />
         </div>
+      <section class="section">
+        <div class="order-form">
+          <order-form />
+        </div>
+      </section>
+      <section class="section">
+        <div class="new-product-form">
+          <new-product-form :products="products" />
+        </div>
+      </section>
       </div>
     </section>
   </main>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import ProductsList from '@/components/ProductsList.vue';
+import { useProducts } from '@/composables/useProducts';
+import OrderForm from '@/components/OrderForm.vue';
+import NewProductForm from '@/components/NewProductForm.vue';
 
 const hoverBgColor = ref('#f5f5f5');
 const hoverTextColor = ref('green');
@@ -118,34 +131,11 @@ const toggleList = () => {
   isListVisible.value = !isListVisible.value;
 }
 
-const products = ref([])
+// Используем composable для загрузки продуктов
+// Логика вынесена из компонента для лучшей организации кода
+const { products, productsState, fetchProducts } = useProducts()
 
-const productsState = reactive({
-  loading: true,
-  error: null
-})
-
-const fetchProducts = async () => {
-  try {
-    productsState.loading = true
-    productsState.error = null
-
-    const response = await fetch('https://fakestoreapi.com/products')
-
-    if (!response.ok) {
-      throw new Error(`Ошибка HTTP: ${response.status}`)
-    }
-
-    products.value = await response.json()
-
-  } catch (err) {
-    productsState.error = err.message
-    console.error('Ошибка загрузки:', err)
-  } finally {
-    productsState.loading = false
-  }
-}
-
+// Загружаем продукты при монтировании компонента
 onMounted(() => {
   fetchProducts()
 })

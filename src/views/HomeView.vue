@@ -1,6 +1,6 @@
 <template>
   <main>
-    <section class="section">
+    <!-- <section class="section">
       <h2 class="section__title">Урок 3 - шаблоны</h2>
       <div class="section__body">
         <table>
@@ -29,7 +29,7 @@
           </button>
         </div>
       </div>
-    </section>
+    </section> -->
     <section class="section">
       <h2 class="section__title">Уроки 4, 5 - компоненты, props, формы и события</h2>
       <div class="section__body">

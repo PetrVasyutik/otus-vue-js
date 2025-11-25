@@ -1,17 +1,29 @@
 <script setup>
 import { RouterView } from 'vue-router';
 import MainHeader from '@/components/MainHeader.vue';
+import MainFooter from '@/components/MainFooter.vue';
 </script>
 
 <template>
-  <header>
+  <div class="app-wrapper">
     <main-header />
-  </header>
-
-  <RouterView />
+    <main class="app-main">
+      <router-view />
+    </main>
+    <main-footer />
+  </div>
 </template>
 
 <style scoped>
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+}
 header {
   line-height: 1.5;
   max-height: 100vh;

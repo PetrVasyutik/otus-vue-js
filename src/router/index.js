@@ -3,6 +3,8 @@ import HomeView from '@/views/HomeView.vue';
 import AboutView from '@/views/AboutView.vue';
 import CatalogView from '@/views/CatalogView.vue';
 import NotFound from '@/views/NotFound.vue';
+import LoginView from '@/views/LoginView.vue';
+import UserAccountView from '@/views/UserAccountView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,9 +20,19 @@ const router = createRouter({
       component: AboutView,
     },
     {
+      path: '/login',
+      name: 'Login',
+      component: LoginView,
+    },
+    {
       path: '/catalog',
       name: 'Catalog',
       component: CatalogView,
+    },
+    {
+      path: '/account',
+      name: 'UserAccount',
+      component: UserAccountView,
     },
     {
       path: '/*',

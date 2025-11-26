@@ -11,6 +11,11 @@
           {{ route.name }}
         </router-link>
       </nav>
+      <nav class="user-nav">
+        <router-link to="/login" class="user-nav__link">
+          Личный кабинет
+        </router-link>
+      </nav>
     </div>
   </div>
 </template>
@@ -21,12 +26,14 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут)
+// Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login и account)
 const routes = computed(() => {
   return router.getRoutes().filter(route =>
     route.name &&
     route.path !== '/*' &&
-    !route.path.includes('*')
+    !route.path.includes('*') &&
+    route.path !== '/login' &&
+    route.path !== '/account'
   )
 })
 </script>
@@ -42,6 +49,9 @@ const routes = computed(() => {
 .main-header__container {
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .main-nav {
@@ -67,6 +77,33 @@ const routes = computed(() => {
 }
 
 .main-nav__link.router-link-active {
+  background-color: chocolate;
+  color: white;
+}
+
+.user-nav {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.user-nav__link {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.user-nav__link:hover {
+  background-color: rgba(210, 105, 30, 0.1);
+  color: chocolate;
+}
+
+.user-nav__link.router-link-active {
   background-color: chocolate;
   color: white;
 }

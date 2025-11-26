@@ -5,25 +5,10 @@
         <order-form />
       </div>
     </section>
-    <section class="section">
-      <div class="new-product-form">
-        <new-product-form :products="products" />
-      </div>
-    </section>
   </main>
 </template>
 <script setup>
-import { onMounted } from 'vue';
-import { useProducts } from '@/composables/useProducts';
 import OrderForm from '@/components/OrderForm.vue';
-import NewProductForm from '@/components/NewProductForm.vue';
-
-const { products, fetchProducts } = useProducts()
-
-// Загружаем продукты при монтировании компонента
-onMounted(() => {
-  fetchProducts()
-})
 </script>
 <style scoped lang="css">
 .section {

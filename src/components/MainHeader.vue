@@ -26,12 +26,14 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login и account)
+// Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login, account и динамические маршруты)
 const routes = computed(() => {
   return router.getRoutes().filter(route =>
     route.name &&
     route.path !== '/*' &&
     !route.path.includes('*') &&
+    !route.path.includes(':') &&
+    route.name !== 'Product' &&
     route.path !== '/login' &&
     route.path !== '/account'
   )

@@ -1,32 +1,40 @@
 <template>
-  <article class="product-card">
-    <div class="product-card__image">
+  <article class="preview-product-card">
+    <div class="preview-product-card__image">
       <img :src="props.product.image" :alt="props.product.title" width="120" height="100" />
     </div>
-    <div class="product-card__info">
-      <h4 class="product-card__title">{{ props.product.title }}</h4>
-      <p class="product-card__category">{{ props.product.category }}</p>
-      <p class="product-card__price">${{ props.product.price }}</p>
-      <div class="product-card__rating">
+    <div class="preview-product-card__info">
+      <h4>{{ props.product.title }}</h4>
+      <p class="preview-product-card__category">{{ props.product.category }}</p>
+      <p class="preview-product-card__price">${{ props.product.price }}</p>
+      <div class="preview-product-card__rating">
         ⭐ {{ props.product.rating.rate }} ({{ props.product.rating.count }} оценок)
       </div>
 
     </div>
-    <button class="product-card__btn">Добавить в корзину</button>
+    <button class="preview-product-card__btn" @click="handleDetailsClick">Подробнее</button>
   </article>
 </template>
 <script setup>
+import { useRouter } from 'vue-router';
+
 const props = defineProps({
   product: {
     type: Object,
     required: true
   }
-})
+});
+
+const router = useRouter();
+
+const handleDetailsClick = () => {
+  router.push({ name: 'Product', params: { id: props.product.id } });
+};
 </script>
 <style scoped lang="css">
-.product-card {
-  width: 570px;
-  min-height: 400px;
+.preview-product-card {
+  width: 270px;
+  height: auto;
   background-color: rgb(255, 255, 233);
   padding: 25px 15px;
   border-radius: 5px;
@@ -36,15 +44,14 @@ const props = defineProps({
   justify-content: space-between;
   gap: 20px;
 }
-
-.product-card__image {
+.preview-product-card__image {
   width: 100%;
   height: 130px;
   object-fit: cover;
   text-align: center;
 }
 
-.product-card__info {
+.preview-product-card__info {
   width: 100%;
   height: 100%;
   flex-grow: 1;
@@ -54,31 +61,7 @@ const props = defineProps({
   gap: 10px;
 }
 
-.product-card__title {
-  font-size: 18px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.product-card__category {
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-}
-
-.product-card__price {
-  font-size: 16px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.product-card__rating {
-  font-size: 14px;
-  font-weight: 400;
-  text-align: center;
-}
-
-.product-card__btn {
+.preview-product-card__btn {
   margin-top: auto;
   background-color: rgb(245, 245, 245);
   color: black;
@@ -90,7 +73,7 @@ const props = defineProps({
   font-weight: 700;
   transition: all 0.3s ease;
 }
-.product-card__btn:hover {
+.preview-product-card__btn:hover {
   transform: scale(1.05);
   box-shadow: 0 0 14px 0 rgba(222, 222, 222, 0.5);
 }

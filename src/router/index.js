@@ -5,6 +5,7 @@ import CatalogView from '@/views/CatalogView.vue';
 import NotFound from '@/views/NotFound.vue';
 import LoginView from '@/views/LoginView.vue';
 import UserAccountView from '@/views/UserAccountView.vue';
+import ProductCardView from '@/views/ProductCardView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
       path: '/account',
       name: 'UserAccount',
       component: UserAccountView,
+    },
+    {
+      path: '/product/:id',
+      name: 'Product',
+      component: ProductCardView,
     },
     {
       path: '/*',

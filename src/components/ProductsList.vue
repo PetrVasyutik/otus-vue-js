@@ -11,7 +11,7 @@
         />
       </div>
       <div class="products-list__catalog">
-        <product-card
+        <preview-product-card
         v-for="product in filteredAndSortedProducts" :key="product.id"
         :product="product" />
       </div>
@@ -21,7 +21,7 @@
 
 <script setup>
 import { toRef } from 'vue';
-import ProductCard from '@/components/ProductCard.vue';
+import PreviewProductCard from '@/components/PreviewProductCard.vue';
 import TitleSearch from '@/components/TitleSearch.vue';
 import CategorySearch from '@/components/CategorySearch.vue';
 import { useProductFilters } from '@/composables/useProductFilters';

@@ -12,16 +12,35 @@
       </div>
 
     </div>
-    <button class="product-card__btn">Добавить в корзину</button>
+    <div class="product-card__cart-info">
+      <div v-if="itemQuantity > 0" class="product-card__quantity">
+        В корзине: {{ itemQuantity }}
+      </div>
+      <button class="product-card__btn" @click="handleAddToCart">Добавить в корзину</button>
+    </div>
   </article>
 </template>
 <script setup>
+import { computed } from 'vue'
+import { useCart } from '@/composables/useCart'
+
 const props = defineProps({
   product: {
     type: Object,
     required: true
   }
 })
+
+const { addToCart, cartItems } = useCart()
+
+const itemQuantity = computed(() => {
+  const item = cartItems.value.find(item => item.product.id === props.product.id)
+  return item ? item.quantity : 0
+})
+
+const handleAddToCart = () => {
+  addToCart(props.product)
+}
 </script>
 <style scoped lang="css">
 .product-card {
@@ -78,8 +97,26 @@ const props = defineProps({
   text-align: center;
 }
 
-.product-card__btn {
+.product-card__cart-info {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.product-card__quantity {
+  font-size: 14px;
+  font-weight: 600;
+  color: chocolate;
+  padding: 6px 12px;
+  background-color: rgba(210, 105, 30, 0.1);
+  border-radius: 4px;
+}
+
+.product-card__btn {
+  width: 100%;
   background-color: rgb(245, 245, 245);
   color: black;
   border: 1px solid rgb(222, 222, 222);

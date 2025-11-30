@@ -12,6 +12,10 @@
         </router-link>
       </nav>
       <nav class="user-nav">
+        <router-link to="/basket" class="user-nav__link user-nav__link--basket">
+          Корзина
+          <span v-if="totalItems > 0" class="user-nav__badge">{{ totalItems }}</span>
+        </router-link>
         <router-link to="/login" class="user-nav__link">
           Личный кабинет
         </router-link>
@@ -23,8 +27,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCart } from '@/composables/useCart'
 
 const router = useRouter()
+const { totalItems } = useCart()
 
 // Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login, account и динамические маршруты)
 const routes = computed(() => {
@@ -35,7 +41,8 @@ const routes = computed(() => {
     !route.path.includes(':') &&
     route.name !== 'Product' &&
     route.path !== '/login' &&
-    route.path !== '/account'
+    route.path !== '/account' &&
+    route.path !== '/basket'
   )
 })
 </script>
@@ -108,5 +115,26 @@ const routes = computed(() => {
 .user-nav__link.router-link-active {
   background-color: chocolate;
   color: white;
+}
+
+.user-nav__link--basket {
+  position: relative;
+}
+
+.user-nav__badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
 </style>

@@ -2,13 +2,18 @@
   <div class="user-account">
     <div class="user-account__header">
       <h1 class="user-account__title">Личный кабинет</h1>
-      <button
-        @click="handleLogout"
-        class="form-btn user-account__logout-btn"
-        aria-label="Выйти из личного кабинета"
-      >
-        Выйти
-      </button>
+      <div class="user-account__buttons-container">
+        <button class="form-btn user-account__basket-btn" @click="handleBasketClick">
+          Корзина
+        </button>
+        <button
+          @click="handleLogout"
+          class="form-btn user-account__logout-btn"
+          aria-label="Выйти из личного кабинета"
+        >
+          Выйти
+        </button>
+      </div>
     </div>
     <div class="user-account__container">
       <div class="user-account__info">
@@ -24,13 +29,15 @@
 import { useRouter } from 'vue-router';
 import NewProductForm from '@/components/NewProductForm.vue';
 import { useProducts } from '@/composables/useProducts';
+import { useLogout } from '@/composables/useLogout';
 
 const router = useRouter();
 const { products } = useProducts();
+const { handleLogout } = useLogout();
 
-const handleLogout = () => {
-  router.push({ name: 'home' });
-};
+const handleBasketClick = () => {
+  router.push({ name: 'Basket' });
+}
 </script>
 <style scoped>
 .user-account {
@@ -70,5 +77,10 @@ const handleLogout = () => {
 .user-account__container {
   display: flex;
   gap: 30px;
+}
+
+.user-account__basket-btn {
+  width: auto;
+  margin-right: 10px;
 }
 </style>

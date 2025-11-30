@@ -1,14 +1,11 @@
 <template>
   <main>
     <section class="section">
-      <div class="order-form">
-        <order-form />
-      </div>
     </section>
   </main>
 </template>
 <script setup>
-import OrderForm from '@/components/OrderForm.vue';
+
 </script>
 <style scoped lang="css">
 .section {

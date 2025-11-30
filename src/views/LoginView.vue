@@ -56,7 +56,8 @@
 import { ErrorMessage, useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { useFormSubmit } from '@/composables/useFormSubmit'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
 // Схема валидации
 const validationSchema = yup.object({
@@ -81,7 +82,9 @@ const { value: password, handleBlur: passwordBlur, handleChange: passwordChange 
 const { value: email, handleBlur: emailBlur, handleChange: emailChange } = useField('email');
 
 const router = useRouter()
+const route = useRoute()
 const { submitMessage, submitMessageClass, submitForm } = useFormSubmit()
+const { login } = useAuth()
 
 const onSubmit = handleSubmit(async (values) => {
   const result = await submitForm({
@@ -97,7 +100,14 @@ const onSubmit = handleSubmit(async (values) => {
 
   // Переход на страницу личного кабинета после успешной отправки
   if (result.success) {
-    router.push({ name: 'UserAccount' })
+    login()
+    // Если был redirect параметр, перенаправляем туда, иначе на личный кабинет
+    const redirect = route.query.redirect
+    if (redirect && typeof redirect === 'string') {
+      router.push(redirect)
+    } else {
+      router.push({ name: 'UserAccount' })
+    }
   }
 })
 </script>

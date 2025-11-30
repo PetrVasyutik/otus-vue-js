@@ -6,6 +6,8 @@ import NotFound from '@/views/NotFound.vue';
 import LoginView from '@/views/LoginView.vue';
 import UserAccountView from '@/views/UserAccountView.vue';
 import ProductCardView from '@/views/ProductCardView.vue';
+import BasketView from '@/views/BasketView.vue';
+import { useAuth } from '@/composables/useAuth';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +36,13 @@ const router = createRouter({
       path: '/account',
       name: 'UserAccount',
       component: UserAccountView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/basket',
+      name: 'Basket',
+      component: BasketView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/product/:id',
@@ -46,6 +55,24 @@ const router = createRouter({
       component: NotFound,
     },
   ],
+})
+
+// Navigation guard для защиты страниц, требующих авторизации
+router.beforeEach((to, from, next) => {
+  const { checkAuth } = useAuth()
+
+  // Проверяем, требует ли маршрут авторизации
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Если пользователь не авторизован, перенаправляем на страницу входа
+    if (!checkAuth()) {
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+    } else {
+      next()
+    }
+  } else {
+    // Если авторизация не требуется, разрешаем переход
+    next()
+  }
 })
 
 export default router

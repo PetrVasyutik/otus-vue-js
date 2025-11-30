@@ -1,7 +1,6 @@
 <template>
   <div class="products-list">
     <div class="products-list__header">
-      <h3 class="product-list__title">Каталог товаров</h3>
       <title-search @search="handleSearch" />
     </div>
     <div class="products-list__body">
@@ -12,7 +11,7 @@
         />
       </div>
       <div class="products-list__catalog">
-        <product-card
+        <preview-product-card
         v-for="product in filteredAndSortedProducts" :key="product.id"
         :product="product" />
       </div>
@@ -22,7 +21,7 @@
 
 <script setup>
 import { toRef } from 'vue';
-import ProductCard from '@/components/ProductCard.vue';
+import PreviewProductCard from '@/components/PreviewProductCard.vue';
 import TitleSearch from '@/components/TitleSearch.vue';
 import CategorySearch from '@/components/CategorySearch.vue';
 import { useProductFilters } from '@/composables/useProductFilters';
@@ -41,10 +40,10 @@ const products = toRef(props, 'products')
 
 // Используем composables для работы с фильтрами и категориями
 const { categories } = useCategories(products)
-const { 
-  updateSearchFilters, 
-  updateCategories, 
-  filteredAndSortedProducts 
+const {
+  updateSearchFilters,
+  updateCategories,
+  filteredAndSortedProducts
 } = useProductFilters(products)
 
 const handleSearch = (filters) => {

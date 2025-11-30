@@ -89,6 +89,81 @@
         </label>
 
         <label class="form-label">
+          <input
+            type="date"
+            name="birth_date"
+            v-model="birthDate"
+            @blur="birthDateBlur"
+            @input="birthDateChange"
+            placeholder="Дата рождения"
+            :class="{ 'form-input--error': errors.birth_date }"
+            class="form-input"
+          />
+          <ErrorMessage name="birth_date" class="form-error" />
+        </label>
+
+        <div class="order-form__cart-summary">
+          <h3 class="order-form__summary-title">Итого в корзине:</h3>
+          <p class="order-form__summary-text">
+            Количество товаров: <strong>{{ totalItems }}</strong>
+          </p>
+          <p class="order-form__summary-text">
+            Общая стоимость: <strong>${{ totalPrice.toFixed(2) }}</strong>
+          </p>
+        </div>
+
+        <div class="order-form__payment-section">
+          <h3 class="order-form__section-title">Данные платежной карты</h3>
+
+          <label class="form-label">
+            <input
+              type="text"
+              name="card_number"
+              v-model="cardNumber"
+              @blur="cardNumberBlur"
+              @input="handleCardNumberInput"
+              placeholder="0000 0000 0000 0000"
+              maxlength="19"
+              :class="{ 'form-input--error': errors.card_number }"
+              class="form-input"
+            />
+            <ErrorMessage name="card_number" class="form-error" />
+          </label>
+
+          <div class="order-form__card-row">
+            <label class="form-label">
+              <input
+                type="text"
+                name="card_expiry"
+                v-model="cardExpiry"
+                @blur="cardExpiryBlur"
+                @input="handleCardExpiryInput"
+                placeholder="MM/YY"
+                maxlength="5"
+                :class="{ 'form-input--error': errors.card_expiry }"
+                class="form-input"
+              />
+              <ErrorMessage name="card_expiry" class="form-error" />
+            </label>
+
+            <label class="form-label">
+              <input
+                type="text"
+                name="card_cvv"
+                v-model="cardCvv"
+                @blur="cardCvvBlur"
+                @input="handleCardCvvInput"
+                placeholder="CVV"
+                maxlength="4"
+                :class="{ 'form-input--error': errors.card_cvv }"
+                class="form-input"
+              />
+              <ErrorMessage name="card_cvv" class="form-error" />
+            </label>
+          </div>
+        </div>
+
+        <label class="form-label">
           <textarea
             name="order_description"
             v-model="orderDescription"
@@ -139,6 +214,9 @@
 import { ErrorMessage, useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { useFormSubmit } from '@/composables/useFormSubmit'
+import { useCart } from '@/composables/useCart'
+
+const { totalItems, totalPrice } = useCart()
 
 // Схема валидации
 const validationSchema = yup.object({
@@ -165,6 +243,23 @@ const validationSchema = yup.object({
     .string()
     .required('Адрес обязателен для заполнения')
     .min(10, 'Адрес должен содержать минимум 10 символов'),
+  birth_date: yup
+    .date()
+    .required('Дата рождения обязательна для заполнения')
+    .max(new Date(), 'Дата рождения не может быть в будущем')
+    .typeError('Введите корректную дату'),
+  card_number: yup
+    .string()
+    .required('Номер карты обязателен для заполнения')
+    .matches(/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/, 'Номер карты должен быть в формате 0000 0000 0000 0000'),
+  card_expiry: yup
+    .string()
+    .required('Срок действия карты обязателен для заполнения')
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Срок действия должен быть в формате MM/YY'),
+  card_cvv: yup
+    .string()
+    .required('CVV обязателен для заполнения')
+    .matches(/^\d{3,4}$/, 'CVV должен содержать 3 или 4 цифры'),
   order_description: yup
     .string()
     .required('Описание заказа обязательно для заполнения')
@@ -184,6 +279,10 @@ const { value: lastName, handleBlur: lastNameBlur, handleChange: lastNameChange 
 const { value: phone, handleBlur: phoneBlur, handleChange: phoneChange } = useField('phone')
 const { value: email, handleBlur: emailBlur, handleChange: emailChange } = useField('email')
 const { value: address, handleBlur: addressBlur, handleChange: addressChange } = useField('address')
+const { value: birthDate, handleBlur: birthDateBlur, handleChange: birthDateChange } = useField('birth_date')
+const { value: cardNumber, handleBlur: cardNumberBlur, handleChange: cardNumberChange } = useField('card_number')
+const { value: cardExpiry, handleBlur: cardExpiryBlur, handleChange: cardExpiryChange } = useField('card_expiry')
+const { value: cardCvv, handleBlur: cardCvvBlur, handleChange: cardCvvChange } = useField('card_cvv')
 const { value: orderDescription, handleBlur: orderDescriptionBlur, handleChange: orderDescriptionChange } = useField('order_description')
 const { value: privacyAgreed, handleBlur: privacyBlur } = useField('privacy_agreed', {
   type: 'checkbox',
@@ -191,6 +290,32 @@ const { value: privacyAgreed, handleBlur: privacyBlur } = useField('privacy_agre
   uncheckedValue: false,
   initialValue: false
 })
+
+// Обработчики форматирования для полей карты
+const handleCardNumberInput = (e) => {
+  let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '')
+  if (value.length > 16) value = value.slice(0, 16)
+  const formatted = value.match(/.{1,4}/g)?.join(' ') || value
+  e.target.value = formatted
+  cardNumberChange(e)
+}
+
+const handleCardExpiryInput = (e) => {
+  let value = e.target.value.replace(/\D/g, '')
+  if (value.length > 4) value = value.slice(0, 4)
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2)
+  }
+  e.target.value = value
+  cardExpiryChange(e)
+}
+
+const handleCardCvvInput = (e) => {
+  let value = e.target.value.replace(/\D/g, '')
+  if (value.length > 4) value = value.slice(0, 4)
+  e.target.value = value
+  cardCvvChange(e)
+}
 
 const { submitMessage, submitMessageClass, submitForm } = useFormSubmit()
 
@@ -217,5 +342,59 @@ const onSubmit = handleSubmit(async (values) => {
   border-radius: 5px;
   display: flex;
   flex-direction: column;
+}
+
+.order-form__cart-summary {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid chocolate;
+  margin: 20px 0;
+}
+
+.order-form__summary-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.order-form__summary-text {
+  font-size: 16px;
+  color: #333;
+  margin: 8px 0;
+}
+
+.order-form__summary-text strong {
+  color: chocolate;
+  font-size: 18px;
+}
+
+.order-form__payment-section {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.order-form__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.order-form__card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+  .order-form__card-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

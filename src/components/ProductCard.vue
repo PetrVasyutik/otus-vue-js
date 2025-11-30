@@ -4,7 +4,7 @@
       <img :src="props.product.image" :alt="props.product.title" width="120" height="100" />
     </div>
     <div class="product-card__info">
-      <h4>{{ props.product.title }}</h4>
+      <h4 class="product-card__title">{{ props.product.title }}</h4>
       <p class="product-card__category">{{ props.product.category }}</p>
       <p class="product-card__price">${{ props.product.price }}</p>
       <div class="product-card__rating">
@@ -12,21 +12,40 @@
       </div>
 
     </div>
-    <button class="product-card__btn">Добавить в корзину</button>
+    <div class="product-card__cart-info">
+      <div v-if="itemQuantity > 0" class="product-card__quantity">
+        В корзине: {{ itemQuantity }}
+      </div>
+      <button class="product-card__btn" @click="handleAddToCart">Добавить в корзину</button>
+    </div>
   </article>
 </template>
 <script setup>
+import { computed } from 'vue'
+import { useCart } from '@/composables/useCart'
+
 const props = defineProps({
   product: {
     type: Object,
     required: true
   }
 })
+
+const { addToCart, cartItems } = useCart()
+
+const itemQuantity = computed(() => {
+  const item = cartItems.value.find(item => item.product.id === props.product.id)
+  return item ? item.quantity : 0
+})
+
+const handleAddToCart = () => {
+  addToCart(props.product)
+}
 </script>
 <style scoped lang="css">
 .product-card {
-  width: 270px;
-  height: auto;
+  width: 570px;
+  min-height: 400px;
   background-color: rgb(255, 255, 233);
   padding: 25px 15px;
   border-radius: 5px;
@@ -36,6 +55,7 @@ const props = defineProps({
   justify-content: space-between;
   gap: 20px;
 }
+
 .product-card__image {
   width: 100%;
   height: 130px;
@@ -53,8 +73,50 @@ const props = defineProps({
   gap: 10px;
 }
 
-.product-card__btn {
+.product-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.product-card__category {
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.product-card__price {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.product-card__rating {
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.product-card__cart-info {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.product-card__quantity {
+  font-size: 14px;
+  font-weight: 600;
+  color: chocolate;
+  padding: 6px 12px;
+  background-color: rgba(210, 105, 30, 0.1);
+  border-radius: 4px;
+}
+
+.product-card__btn {
+  width: 100%;
   background-color: rgb(245, 245, 245);
   color: black;
   border: 1px solid rgb(222, 222, 222);

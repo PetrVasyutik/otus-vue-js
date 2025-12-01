@@ -50,16 +50,18 @@
 <script setup>
 import { ref } from 'vue';
 import { useLogout } from '@/composables/useLogout';
-import { useCart } from '@/composables/useCart';
+import { useAppStore } from '@/stores/appStore';
 import OrderForm from '@/components/OrderForm.vue';
 
 const { handleLogout } = useLogout();
-const { cartItems, clearCart } = useCart();
+// Используем Pinia store вместо composable
+const store = useAppStore();
+const cartItems = store.cartItems;
 
 const showOrderForm = ref(false);
 
 const handleClearCart = () => {
-  clearCart();
+  store.clearCart();
 };
 </script>
 <style scoped>

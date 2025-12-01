@@ -28,10 +28,17 @@
 <script setup>
 import { onMounted } from 'vue';
 import ProductsList from '@/components/ProductsList.vue';
-import { useProducts } from '@/composables/useProducts';
+import { useAppStore } from '@/stores/appStore';
 
-const { products, productsState, fetchProducts } = useProducts()
+// Используем Pinia store вместо composable
+const store = useAppStore()
 
+// Получаем данные из store
+const products = store.products
+const productsState = store.productsState
+const fetchProducts = store.fetchProducts
+
+// Загружаем товары при монтировании компонента
 onMounted(() => {
   fetchProducts()
 })

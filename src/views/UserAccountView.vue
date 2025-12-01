@@ -28,11 +28,13 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import NewProductForm from '@/components/NewProductForm.vue';
-import { useProducts } from '@/composables/useProducts';
+import { useAppStore } from '@/stores/appStore';
 import { useLogout } from '@/composables/useLogout';
 
 const router = useRouter();
-const { products } = useProducts();
+// Используем Pinia store вместо composable
+const store = useAppStore();
+const products = store.products;
 const { handleLogout } = useLogout();
 
 const handleBasketClick = () => {

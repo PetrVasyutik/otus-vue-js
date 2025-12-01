@@ -214,9 +214,12 @@
 import { ErrorMessage, useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { useFormSubmit } from '@/composables/useFormSubmit'
-import { useCart } from '@/composables/useCart'
+import { useAppStore } from '@/stores/appStore'
 
-const { totalItems, totalPrice } = useCart()
+// Используем Pinia store вместо composable
+const store = useAppStore()
+const totalItems = store.totalItems
+const totalPrice = store.totalPrice
 
 // Схема валидации
 const validationSchema = yup.object({

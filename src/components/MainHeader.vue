@@ -27,10 +27,12 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useCart } from '@/composables/useCart'
+import { useAppStore } from '@/stores/appStore'
 
 const router = useRouter()
-const { totalItems } = useCart()
+// Используем Pinia store вместо composable
+const store = useAppStore()
+const totalItems = store.totalItems
 
 // Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login, account и динамические маршруты)
 const routes = computed(() => {

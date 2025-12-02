@@ -7,7 +7,7 @@ import LoginView from '@/views/LoginView.vue';
 import UserAccountView from '@/views/UserAccountView.vue';
 import ProductCardView from '@/views/ProductCardView.vue';
 import BasketView from '@/views/BasketView.vue';
-import { useAuth } from '@/composables/useAuth';
+import { useAppStore } from '@/stores/appStore';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -59,12 +59,12 @@ const router = createRouter({
 
 // Navigation guard для защиты страниц, требующих авторизации
 router.beforeEach((to, from, next) => {
-  const { checkAuth } = useAuth()
+  const store = useAppStore()
 
   // Проверяем, требует ли маршрут авторизации
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Если пользователь не авторизован, перенаправляем на страницу входа
-    if (!checkAuth()) {
+    if (!store.user.isAuthenticated) {
       next({ name: 'Login', query: { redirect: to.fullPath } })
     } else {
       next()

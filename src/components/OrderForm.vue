@@ -215,11 +215,11 @@ import { ErrorMessage, useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { useFormSubmit } from '@/composables/useFormSubmit'
 import { useAppStore } from '@/stores/appStore'
+import { storeToRefs } from 'pinia'
 
 // Используем Pinia store вместо composable
 const store = useAppStore()
-const totalItems = store.totalItems
-const totalPrice = store.totalPrice
+const { totalItems, totalPrice } = storeToRefs(store)
 
 // Схема валидации
 const validationSchema = yup.object({
@@ -294,7 +294,6 @@ const { value: privacyAgreed, handleBlur: privacyBlur } = useField('privacy_agre
   initialValue: false
 })
 
-// Обработчики форматирования для полей карты
 const handleCardNumberInput = (e) => {
   let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '')
   if (value.length > 16) value = value.slice(0, 16)
@@ -323,6 +322,18 @@ const handleCardCvvInput = (e) => {
 const { submitMessage, submitMessageClass, submitForm } = useFormSubmit()
 
 const onSubmit = handleSubmit(async (values) => {
+
+  // Сохраняем / обновляем профиль пользователя в store
+  store.login({
+    firstName: values.first_name,
+    lastName: values.last_name,
+    email: values.email,
+    phone: values.phone,
+    address: values.address,
+    birthDate: values.birth_date
+  })
+
+  // Отправляем заказ
   await submitForm({
     url: 'https://httpbin.org/post',
     data: values,

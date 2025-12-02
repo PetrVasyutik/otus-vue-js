@@ -27,18 +27,16 @@
 </template>
 <script setup>
 import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import ProductsList from '@/components/ProductsList.vue';
 import { useAppStore } from '@/stores/appStore';
 
-// Используем Pinia store вместо composable
 const store = useAppStore()
 
-// Получаем данные из store
-const products = store.products
-const productsState = store.productsState
-const fetchProducts = store.fetchProducts
+const { products, productsState } = storeToRefs(store)
 
-// Загружаем товары при монтировании компонента
+const { fetchProducts } = store
+
 onMounted(() => {
   fetchProducts()
 })

@@ -52,11 +52,12 @@ import { ref } from 'vue';
 import { useLogout } from '@/composables/useLogout';
 import { useAppStore } from '@/stores/appStore';
 import OrderForm from '@/components/OrderForm.vue';
+import { storeToRefs } from 'pinia';
 
 const { handleLogout } = useLogout();
-// Используем Pinia store вместо composable
+
 const store = useAppStore();
-const cartItems = store.cartItems;
+const { cartItems } = storeToRefs(store);
 
 const showOrderForm = ref(false);
 

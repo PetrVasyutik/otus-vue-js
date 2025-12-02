@@ -135,16 +135,12 @@ export const useAppStore = defineStore('app', () => {
   })
 
   // Actions - методы для работы с пользователем
-  const login = (userData) => {
-    // userData должен содержать: firstName, lastName, email, phone, address, birthDate
+  const login = (userData = {}) => {
+
     user.value = {
-      isAuthenticated: true,
-      firstName: userData.firstName || '',
-      lastName: userData.lastName || '',
-      email: userData.email || '',
-      phone: userData.phone || '',
-      address: userData.address || '',
-      birthDate: userData.birthDate || ''
+      ...user.value,
+      ...userData,
+      isAuthenticated: true
     }
 
     // Сохраняем данные пользователя в localStorage
@@ -208,7 +204,7 @@ export const useAppStore = defineStore('app', () => {
     products,
     productsLoading,
     productsError,
-    productsState, // computed для обратной совместимости
+    productsState,
     fetchProducts,
 
     // Cart

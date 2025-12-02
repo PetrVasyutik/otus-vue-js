@@ -22,7 +22,7 @@
 </template>
 <script setup>
 import { computed } from 'vue'
-import { useCart } from '@/composables/useCart'
+import { useAppStore } from '@/stores/appStore'
 
 const props = defineProps({
   product: {
@@ -31,15 +31,16 @@ const props = defineProps({
   }
 })
 
-const { addToCart, cartItems } = useCart()
+// Используем Pinia store вместо composable
+const store = useAppStore()
 
 const itemQuantity = computed(() => {
-  const item = cartItems.value.find(item => item.product.id === props.product.id)
+  const item = store.cartItems.find(item => item.product.id === props.product.id)
   return item ? item.quantity : 0
 })
 
 const handleAddToCart = () => {
-  addToCart(props.product)
+  store.addToCart(props.product)
 }
 </script>
 <style scoped lang="css">

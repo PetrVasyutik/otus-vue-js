@@ -16,7 +16,23 @@
           Корзина
           <span v-if="totalItems > 0" class="user-nav__badge">{{ totalItems }}</span>
         </router-link>
-        <router-link to="/login" class="user-nav__link">
+
+        <!-- Если пользователь авторизован, показываем ФИО и кнопку "Выйти" -->
+        <div v-if="user.isAuthenticated" class="user-nav__user">
+          <span class="user-nav__user-name">
+            {{ fullName || user.email }}
+          </span>
+          <button
+            type="button"
+            class="user-nav__link user-nav__logout-btn"
+            @click="handleLogout"
+          >
+            Выйти
+          </button>
+        </div>
+
+        <!-- Если не авторизован, показываем ссылку на личный кабинет -->
+        <router-link v-else to="/login" class="user-nav__link">
           Личный кабинет
         </router-link>
       </nav>
@@ -27,12 +43,17 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useCart } from '@/composables/useCart'
+import { useAppStore } from '@/stores/appStore'
+import { useLogout } from '@/composables/useLogout'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const { totalItems } = useCart()
 
-// Получаем маршруты из роутера и фильтруем (исключаем catch-all маршрут, login, account и динамические маршруты)
+const store = useAppStore()
+const { totalItems, user, fullName } = storeToRefs(store)
+
+const { handleLogout } = useLogout()
+
 const routes = computed(() => {
   return router.getRoutes().filter(route =>
     route.name &&
@@ -115,6 +136,23 @@ const routes = computed(() => {
 .user-nav__link.router-link-active {
   background-color: chocolate;
   color: white;
+}
+
+.user-nav__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-nav__user-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.user-nav__logout-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .user-nav__link--basket {

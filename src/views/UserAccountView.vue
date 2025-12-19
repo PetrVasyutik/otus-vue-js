@@ -27,12 +27,14 @@
 </template>
 <script setup>
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import NewProductForm from '@/components/NewProductForm.vue';
-import { useProducts } from '@/composables/useProducts';
+import { useAppStore } from '@/stores/appStore';
 import { useLogout } from '@/composables/useLogout';
 
 const router = useRouter();
-const { products } = useProducts();
+const store = useAppStore();
+const { products } = storeToRefs(store);
 const { handleLogout } = useLogout();
 
 const handleBasketClick = () => {

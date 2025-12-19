@@ -50,16 +50,19 @@
 <script setup>
 import { ref } from 'vue';
 import { useLogout } from '@/composables/useLogout';
-import { useCart } from '@/composables/useCart';
+import { useAppStore } from '@/stores/appStore';
 import OrderForm from '@/components/OrderForm.vue';
+import { storeToRefs } from 'pinia';
 
 const { handleLogout } = useLogout();
-const { cartItems, clearCart } = useCart();
+
+const store = useAppStore();
+const { cartItems } = storeToRefs(store);
 
 const showOrderForm = ref(false);
 
 const handleClearCart = () => {
-  clearCart();
+  store.clearCart();
 };
 </script>
 <style scoped>

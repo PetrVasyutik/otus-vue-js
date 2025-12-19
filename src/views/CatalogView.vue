@@ -27,10 +27,15 @@
 </template>
 <script setup>
 import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import ProductsList from '@/components/ProductsList.vue';
-import { useProducts } from '@/composables/useProducts';
+import { useAppStore } from '@/stores/appStore';
 
-const { products, productsState, fetchProducts } = useProducts()
+const store = useAppStore()
+
+const { products, productsState } = storeToRefs(store)
+
+const { fetchProducts } = store
 
 onMounted(() => {
   fetchProducts()

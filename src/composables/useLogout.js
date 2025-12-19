@@ -1,12 +1,13 @@
 import { useRouter } from 'vue-router';
-import { useAuth } from '@/composables/useAuth';
+import { useAppStore } from '@/stores/appStore';
 
 export function useLogout() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const store = useAppStore();
 
   const handleLogout = () => {
-    logout();
+    // Выходим из системы через Pinia store
+    store.logout();
     router.push({ name: 'home' });
   };
 

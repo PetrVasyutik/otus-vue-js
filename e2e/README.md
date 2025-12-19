@@ -55,3 +55,5 @@ npx playwright test e2e/login.spec.js
 - Базовый URL: `http://localhost:5173`
 - Убедитесь, что порт 5173 свободен перед запуском тестов
 
+
+

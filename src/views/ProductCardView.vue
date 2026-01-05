@@ -13,9 +13,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAppStore } from '@/stores/appStore';
+import { storeToRefs } from 'pinia';
 import ProductCard from '@/components/ProductCard.vue';
 
 const route = useRoute();
+const store = useAppStore();
+const { productsLoading, productsError } = storeToRefs(store);
+
 const product = ref(null);
 const loading = ref(true);
 const error = ref(null);
@@ -26,15 +31,10 @@ const fetchProduct = async () => {
     error.value = null;
 
     const productId = route.params.id;
-    const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
-
-    if (!response.ok) {
-      throw new Error(`Ошибка HTTP: ${response.status}`);
-    }
-
-    product.value = await response.json();
+    const productData = await store.fetchProduct(productId);
+    product.value = productData;
   } catch (err) {
-    error.value = err.message;
+    error.value = err.message || 'Ошибка загрузки товара';
     console.error('Ошибка загрузки товара:', err);
   } finally {
     loading.value = false;

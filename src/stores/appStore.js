@@ -1,19 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { request } from '@/graphql/client'
+import { GET_PRODUCTS, GET_PRODUCT } from '@/graphql/queries/products'
 
 /**
  * Главный store приложения
  * Использует Composition API синтаксис (setup stores)
- *
- * Содержит три основные секции:
- * 1. products - товары каталога
- * 2. cart - корзина покупок
- * 3. user - данные пользователя
  */
 export const useAppStore = defineStore('app', () => {
-  // ============================================
-  // СЕКЦИЯ 1: ТОВАРЫ КАТАЛОГА (PRODUCTS)
-  // ============================================
 
   // State - реактивные данные
   const products = ref([]) // массив товаров
@@ -21,21 +15,39 @@ export const useAppStore = defineStore('app', () => {
   const productsError = ref(null) // ошибка загрузки
 
   // Actions - методы для работы с товарами
-  const fetchProducts = async (url = 'https://fakestoreapi.com/products') => {
+  // GraphQL версия загрузки товаров
+  const fetchProducts = async (options = {}) => {
     try {
       productsLoading.value = true
       productsError.value = null
 
-      const response = await fetch(url)
+      const { limit, offset } = options
+      const variables = {}
+      if (limit !== undefined) variables.limit = limit
+      if (offset !== undefined) variables.offset = offset
 
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`)
-      }
-
-      products.value = await response.json()
+      const data = await request(GET_PRODUCTS, variables)
+      products.value = data.products || []
     } catch (err) {
-      productsError.value = err.message
+      productsError.value = err.message || 'Ошибка загрузки товаров'
       console.error('Ошибка загрузки товаров:', err)
+    } finally {
+      productsLoading.value = false
+    }
+  }
+
+  // Загрузка одного товара по ID через GraphQL
+  const fetchProduct = async (productId) => {
+    try {
+      productsLoading.value = true
+      productsError.value = null
+
+      const data = await request(GET_PRODUCT, { id: parseInt(productId) })
+      return data.product
+    } catch (err) {
+      productsError.value = err.message || 'Ошибка загрузки товара'
+      console.error('Ошибка загрузки товара:', err)
+      throw err
     } finally {
       productsLoading.value = false
     }
@@ -47,10 +59,6 @@ export const useAppStore = defineStore('app', () => {
     loading: productsLoading.value,
     error: productsError.value
   }))
-
-  // ============================================
-  // СЕКЦИЯ 2: КОРЗИНА (CART)
-  // ============================================
 
   // State - товары в корзине
   const cartItems = ref([]) // массив объектов { product, quantity }
@@ -118,10 +126,6 @@ export const useAppStore = defineStore('app', () => {
       console.error('Ошибка загрузки корзины:', err)
     }
   }
-
-  // ============================================
-  // СЕКЦИЯ 3: ПОЛЬЗОВАТЕЛЬ (USER)
-  // ============================================
 
   // State - данные пользователя
   const user = ref({
@@ -196,9 +200,6 @@ export const useAppStore = defineStore('app', () => {
   loadCartFromStorage()
   loadUserFromStorage()
 
-  // ============================================
-  // ЭКСПОРТ - возвращаем все, что нужно использовать в компонентах
-  // ============================================
   return {
     // Products
     products,
@@ -206,6 +207,7 @@ export const useAppStore = defineStore('app', () => {
     productsError,
     productsState,
     fetchProducts,
+    fetchProduct,
 
     // Cart
     cartItems,

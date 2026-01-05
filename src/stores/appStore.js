@@ -14,6 +14,10 @@ export const useAppStore = defineStore('app', () => {
   const productsLoading = ref(false) // состояние загрузки
   const productsError = ref(null) // ошибка загрузки
 
+  // WebSocket состояние
+  const wsConnected = ref(false) // статус WebSocket соединения
+  const notifications = ref([]) // массив уведомлений
+
   // Actions - методы для работы с товарами
   // GraphQL версия загрузки товаров
   const fetchProducts = async (options = {}) => {
@@ -51,6 +55,49 @@ export const useAppStore = defineStore('app', () => {
     } finally {
       productsLoading.value = false
     }
+  }
+
+  // Обновление цены товара через WebSocket
+  const updateProductPrice = (productId, newPrice) => {
+    const product = products.value.find(p => p.id === productId)
+    if (product) {
+      const oldPrice = product.price
+      product.price = newPrice
+
+      // Добавляем уведомление об изменении цены
+      addNotification({
+        type: 'price_update',
+        message: `Цена товара "${product.title}" изменилась: $${oldPrice} → $${newPrice}`,
+        productId,
+        timestamp: new Date().toISOString(),
+      })
+    }
+  }
+
+  // Добавление уведомления
+  const addNotification = (notification) => {
+    notifications.value.unshift({
+      id: Date.now(),
+      ...notification,
+    })
+
+    // Ограничиваем количество уведомлений (последние 10)
+    if (notifications.value.length > 10) {
+      notifications.value = notifications.value.slice(0, 10)
+    }
+  }
+
+  // Удаление уведомления
+  const removeNotification = (notificationId) => {
+    const index = notifications.value.findIndex(n => n.id === notificationId)
+    if (index !== -1) {
+      notifications.value.splice(index, 1)
+    }
+  }
+
+  // Очистка всех уведомлений
+  const clearNotifications = () => {
+    notifications.value = []
   }
 
   // Getters - вычисляемые свойства для товаров
@@ -208,6 +255,14 @@ export const useAppStore = defineStore('app', () => {
     productsState,
     fetchProducts,
     fetchProduct,
+    updateProductPrice,
+
+    // WebSocket
+    wsConnected,
+    notifications,
+    addNotification,
+    removeNotification,
+    clearNotifications,
 
     // Cart
     cartItems,

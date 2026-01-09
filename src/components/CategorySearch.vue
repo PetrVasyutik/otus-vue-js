@@ -18,22 +18,24 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 
-const props = defineProps({
-  categories: {
-    type: Array,
-    required: true,
-    default: () => []
-  }
+interface Props {
+  categories: string[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  categories: () => []
 })
 
-const emit = defineEmits(['category-change'])
+const emit = defineEmits<{
+  (e: 'category-change', categories: string[]): void
+}>()
 
-const selectedCategories = ref([])
+const selectedCategories = ref<string[]>([])
 
-const handleCategoryChange = () => {
+const handleCategoryChange = (): void => {
   emit('category-change', [...selectedCategories.value])
 }
 

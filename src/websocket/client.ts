@@ -1,19 +1,27 @@
-/**
- * WebSocket клиент для работы с real-time обновлениями
- */
+import type { WebSocketMessage } from '@/types/websocket'
 
-let ws = null
+let ws: WebSocket | null = null
 let reconnectAttempts = 0
 const MAX_RECONNECT_ATTEMPTS = 5
 const RECONNECT_DELAY = 3000
 
+export interface WebSocketCallbacks {
+  onOpen?: (event: Event) => void
+  onMessage?: (data: WebSocketMessage) => void
+  onError?: (error: Event) => void
+  onClose?: (event: CloseEvent) => void
+}
+
 /**
  * Создает WebSocket соединение
- * @param {string} url - URL WebSocket сервера
- * @param {object} callbacks - Объект с колбэками для обработки событий
- * @returns {WebSocket} WebSocket соединение
+ * @param url - URL WebSocket сервера
+ * @param callbacks - Объект с колбэками для обработки событий
+ * @returns WebSocket соединение
  */
-export function createWebSocketConnection(url, callbacks = {}) {
+export function createWebSocketConnection(
+  url: string,
+  callbacks: WebSocketCallbacks = {}
+): WebSocket {
   const {
     onOpen = () => {},
     onMessage = () => {},
@@ -24,28 +32,28 @@ export function createWebSocketConnection(url, callbacks = {}) {
   try {
     ws = new WebSocket(url)
 
-    ws.onopen = (event) => {
+    ws.onopen = (event: Event) => {
       console.log('WebSocket соединение установлено')
       reconnectAttempts = 0
       onOpen(event)
     }
 
-    ws.onmessage = (event) => {
+    ws.onmessage = (event: MessageEvent) => {
       try {
-        const data = JSON.parse(event.data)
+        const data = JSON.parse(event.data as string) as WebSocketMessage
         onMessage(data)
       } catch (error) {
         console.error('Ошибка парсинга WebSocket сообщения:', error)
-        onMessage(event.data)
+        onMessage(event.data as unknown as WebSocketMessage)
       }
     }
 
-    ws.onerror = (error) => {
+    ws.onerror = (error: Event) => {
       console.error('WebSocket ошибка:', error)
       onError(error)
     }
 
-    ws.onclose = (event) => {
+    ws.onclose = (event: CloseEvent) => {
       console.log('WebSocket соединение закрыто')
       onClose(event)
 
@@ -68,9 +76,9 @@ export function createWebSocketConnection(url, callbacks = {}) {
 
 /**
  * Отправляет сообщение через WebSocket
- * @param {object} data - Данные для отправки
+ * @param data - Данные для отправки
  */
-export function sendWebSocketMessage(data) {
+export function sendWebSocketMessage(data: unknown): void {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(data))
   } else {
@@ -81,7 +89,7 @@ export function sendWebSocketMessage(data) {
 /**
  * Закрывает WebSocket соединение
  */
-export function closeWebSocketConnection() {
+export function closeWebSocketConnection(): void {
   if (ws) {
     ws.close()
     ws = null
@@ -90,9 +98,8 @@ export function closeWebSocketConnection() {
 
 /**
  * Проверяет, подключен ли WebSocket
- * @returns {boolean}
+ * @returns true если подключен
  */
-export function isWebSocketConnected() {
-  return ws && ws.readyState === WebSocket.OPEN
+export function isWebSocketConnected(): boolean {
+  return ws !== null && ws.readyState === WebSocket.OPEN
 }
-

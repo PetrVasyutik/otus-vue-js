@@ -20,16 +20,16 @@
     </div>
   </article>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useAppStore } from '@/stores/appStore'
+import type { Product } from '@/types/graphql'
 
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true
-  }
-})
+interface Props {
+  product: Product
+}
+
+const props = defineProps<Props>()
 
 // Используем Pinia store вместо composable
 const store = useAppStore()
@@ -39,7 +39,7 @@ const itemQuantity = computed(() => {
   return item ? item.quantity : 0
 })
 
-const handleAddToCart = () => {
+const handleAddToCart = (): void => {
   store.addToCart(props.product)
 }
 </script>
